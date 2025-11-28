@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "soiac": "soiac",
+    "soiac:watch": "soiac --watch",
+    "build": "npm run soiac && ./gradlew build",
+    "format": "./gradlew ktlintFormat",
+    "run:snippets": "./gradlew run",
+    "run:start-service": "./gradlew run -PmainClass=examples.startservice.StartServiceKt",
+    "run:call-service": "./gradlew run -PmainClass=examples.callservice.CallServiceKt"
+  },
+  "devDependencies": {
+    "soia-kotlin-gen": "file:../kotlin-generator",
+    "soiac": "^1.0.51"
+  }
+}
