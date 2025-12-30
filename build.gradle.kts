@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("land.soia:soia-kotlin-client:1.1.4")
+    implementation("build.skir:skir-client:0.0.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("com.squareup.okio:okio:3.6.0")
 }

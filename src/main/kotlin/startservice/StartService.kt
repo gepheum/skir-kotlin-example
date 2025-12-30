@@ -1,5 +1,5 @@
 /**
- * Starts a Soia service on http://localhost:8787/myapi
+ * Starts a Skir service on http://localhost:8787/myapi
  *
  * Run with: ./gradlew run -PmainClass=examples.startservice.StartServiceKt
  *
@@ -8,17 +8,17 @@
 
 package examples.startservice
 
+import build.skir.UnrecognizedValuesPolicy
+import build.skir.service.Service
 import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.runBlocking
-import land.soia.UnrecognizedFieldsPolicy
-import land.soia.service.Service
-import soiagen.service.AddUser
-import soiagen.service.AddUserRequest
-import soiagen.service.AddUserResponse
-import soiagen.service.GetUser
-import soiagen.service.GetUserRequest
-import soiagen.service.GetUserResponse
-import soiagen.user.User
+import skirout.service.AddUser
+import skirout.service.AddUserRequest
+import skirout.service.AddUserResponse
+import skirout.service.GetUser
+import skirout.service.GetUserRequest
+import skirout.service.GetUserResponse
+import skirout.user.User
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.URLDecoder
@@ -62,8 +62,8 @@ class ServiceImpl {
 fun main() {
     val serviceImpl = ServiceImpl()
 
-    // Build the Soia service with custom metadata
-    val soiaService =
+    // Build the Skir service with custom metadata
+    val skirService =
         Service.builder<RequestMetadata> { httpHeaders ->
             val requestHeaders = mutableMapOf<String, String>()
             httpHeaders.map().forEach { (key, values) ->
@@ -111,10 +111,10 @@ fun main() {
             // Handle the request
             val rawResponse =
                 runBlocking {
-                    soiaService.handleRequest(
+                    skirService.handleRequest(
                         requestBody,
                         httpHeaders,
-                        UnrecognizedFieldsPolicy.KEEP,
+                        UnrecognizedValuesPolicy.KEEP,
                     )
                 }
 

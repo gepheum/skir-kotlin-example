@@ -2,6 +2,8 @@
 
 set -e
 
-npm i
-npm run format
-npm run build
+./gradlew ktlintFormat
+npx skir gen
+./gradlew build
+./gradlew run
+

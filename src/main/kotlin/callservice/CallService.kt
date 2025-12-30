@@ -1,19 +1,19 @@
 package examples.callservice
 
+import build.skir.service.ServiceClient
 import kotlinx.coroutines.runBlocking
-import land.soia.service.ServiceClient
-import soiagen.service.AddUser
-import soiagen.service.AddUserRequest
-import soiagen.service.GetUser
-import soiagen.service.GetUserRequest
-import soiagen.user.SubscriptionStatus
-import soiagen.user.TARZAN
-import soiagen.user.User
+import skirout.service.AddUser
+import skirout.service.AddUserRequest
+import skirout.service.GetUser
+import skirout.service.GetUserRequest
+import skirout.user.SubscriptionStatus
+import skirout.user.TARZAN
+import skirout.user.User
 import java.net.http.HttpClient
 import java.time.Duration
 
 /**
- * Sends RPCs to a Soia service. See StartService.kt for how to start one.
+ * Sends RPCs to a Skir service. See StartService.kt for how to start one.
  *
  * Run with: ./gradlew run -PmainClass=examples.callservice.CallServiceKt
  *

@@ -1,9 +1,0 @@
-srcDir: ./soia-src
-
-generators:
-  - mod: soia-kotlin-gen
-    config: {}
-
-mirroredSoiagenDirs:
-  - path: src/main/kotlin/soiagen
-    fileRegex: "\\.kt$"

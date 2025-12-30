@@ -1,0 +1,6 @@
+srcDir: ./skir-src
+
+generators:
+  - mod: skir-kotlin-gen
+    outDir: ./src/main/kotlin/skirout
+    config: {}

@@ -1,16 +1,16 @@
 package examples
 
-import land.soia.JsonFlavor
-import land.soia.reflection.StructDescriptor
-import land.soia.reflection.TypeDescriptor
-import soiagen.user.SubscriptionStatus
-import soiagen.user.SubscriptionStatus.Trial
-import soiagen.user.TARZAN
-import soiagen.user.User
-import soiagen.user.User.Pet
-import soiagen.user.UserHistory
-import soiagen.user.UserRegistry
-import soiagen.user.User_OrMutable
+import build.skir.JsonFlavor
+import build.skir.reflection.StructDescriptor
+import build.skir.reflection.TypeDescriptor
+import skirout.user.SubscriptionStatus
+import skirout.user.SubscriptionStatus.Trial
+import skirout.user.TARZAN
+import skirout.user.User
+import skirout.user.User.Pet
+import skirout.user.UserHistory
+import skirout.user.UserRegistry
+import skirout.user.User_OrMutable
 import java.time.Instant
 
 fun main() {
@@ -18,7 +18,7 @@ fun main() {
     // FROZEN STRUCT CLASSES
     // ===========================================================================
 
-    // For every struct S in the .soia file, soia generates a frozen (deeply
+    // For every struct S in the .skir file, skir generates a frozen (deeply
     // immutable) class 'S' and a mutable class 'S.Mutable'.
 
     // Construct a frozen User.
@@ -157,17 +157,17 @@ fun main() {
     // ENUM CLASSES
     // ===========================================================================
 
-    // Soia generates a deeply immutable Kotlin class for every enum in the .soia
+    // Skir generates a deeply immutable Kotlin class for every enum in the .skir
     // file. This class is *not* a Kotlin enum, although the syntax for referring
     // to constants is similar.
     val someStatuses =
         listOf(
-            // The UNKNOWN constant is present in all Soia enums even if it is not
-            // declared in the .soia file.
+            // The UNKNOWN constant is present in all Skir enums even if it is not
+            // declared in the .skir file.
             SubscriptionStatus.UNKNOWN,
             SubscriptionStatus.FREE,
             SubscriptionStatus.PREMIUM,
-            // Soia generates one subclass {VariantName}Wrapper for every wrapper
+            // Skir generates one subclass {VariantName}Wrapper for every wrapper
             // variant. The constructor of this subclass expects the value to
             // wrap.
             SubscriptionStatus.TrialWrapper(
@@ -241,7 +241,7 @@ fun main() {
     // }
 
     // The dense JSON flavor is the flavor you should pick if you intend to
-    // deserialize the value in the future. Soia allows fields to be renamed,
+    // deserialize the value in the future. Skir allows fields to be renamed,
     // and because field names are not part of the dense JSON, renaming a field
     // does not prevent you from deserializing the value.
     // You should pick the readable flavor mostly for debugging purposes.
@@ -300,14 +300,14 @@ fun main() {
     // KEYED LISTS
     // =========================================================================
 
-    // In the .soia file:
+    // In the .skir file:
     //   struct UserRegistry {
     //     users: [User|user_id];
     //   }
 
     val userRegistry = UserRegistry(users = listOf(john, jane, evilJohn))
 
-    // find() returns the user with the given key (specified in the .soia file).
+    // find() returns the user with the given key (specified in the .skir file).
     // In this example, the key is the user id.
     // The first lookup runs in O(N) time, and the following lookups run in O(1)
     // time.
@@ -321,8 +321,8 @@ fun main() {
     // FROZEN LISTS AND COPIES
     // =========================================================================
 
-    // Since all Soia objects are deeply immutable, all lists contained in a
-    // Soia object are also deeply immutable.
+    // Since all Skir objects are deeply immutable, all lists contained in a
+    // Skir object are also deeply immutable.
     // This section helps understand when lists are copied and when they are
     // not.
     val pets: MutableList<Pet> =
@@ -335,7 +335,7 @@ fun main() {
         User.partial(
             name = "Jade",
             pets = pets,
-            // ^ 'pets' is mutable, so Soia makes an immutable shallow copy of it
+            // ^ 'pets' is mutable, so Skir makes an immutable shallow copy of it
         )
 
     assert(pets == jade.pets)
@@ -345,7 +345,7 @@ fun main() {
         User.partial(
             name = "Jack",
             pets = jade.pets,
-            // ^ 'jade.pets' is already immutable, so Soia does not make a copy
+            // ^ 'jade.pets' is already immutable, so Skir does not make a copy
         )
 
     assert(jack.pets === jade.pets)
@@ -354,7 +354,7 @@ fun main() {
     // REFLECTION
     // =========================================================================
 
-    // Reflection allows you to inspect a soia type at runtime.
+    // Reflection allows you to inspect a skir type at runtime.
     println(
         User.typeDescriptor
             .fields
@@ -373,9 +373,9 @@ fun main() {
     assert((typeDescriptor as StructDescriptor).fields.size == 5)
 
     // The 'allStringsToUpperCase' function uses reflection to convert all the
-    // strings contained in a given Soia value to upper case.
+    // strings contained in a given Skir value to upper case.
     // See the implementation at
-    // https://github.com/gepheum/soia-java-example/blob/main/src/main/java/examples/AllStringsToUpperCase.java
+    // https://github.com/gepheum/skir-java-example/blob/main/src/main/java/examples/AllStringsToUpperCase.java
     println(allStringsToUpperCase(TARZAN, User.typeDescriptor))
     // User(
     // userId = 123,
