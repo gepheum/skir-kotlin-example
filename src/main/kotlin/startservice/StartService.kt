@@ -9,10 +9,21 @@
 package examples.startservice
 
 import build.skir.service.Service
-import com.sun.net.httpserver.Headers
-import com.sun.net.httpserver.HttpServer
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.request.queryString
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.header
+import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.routing
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import skirout.service.AddUser
 import skirout.service.AddUserRequest
 import skirout.service.AddUserResponse
@@ -20,7 +31,6 @@ import skirout.service.GetUser
 import skirout.service.GetUserRequest
 import skirout.service.GetUserResponse
 import skirout.user.User
-import java.net.InetSocketAddress
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -75,52 +85,48 @@ fun main() {
             .addMethod(GetUser) { req, _ -> serviceImpl.getUser(req) }
             .build()
 
-    // Create HTTP server
-    val server = HttpServer.create(InetSocketAddress("localhost", 8787), 0)
-
-    // Root handler
-    server.createContext("/") { exchange ->
-        val response = "Hello, World!"
-        exchange.sendResponseHeaders(200, response.length.toLong())
-        exchange.responseBody.use { os ->
-            os.write(response.toByteArray(StandardCharsets.UTF_8))
-        }
-    }
-
-    // API handler
-    server.createContext("/myapi") { exchange ->
-        // Read request body
-        val requestBody =
-            if (exchange.requestMethod == "POST") {
-                exchange.requestBody.readAllBytes().toString(StandardCharsets.UTF_8)
-            } else {
-                // For GET requests, use the query string
-                val query = exchange.requestURI.query
-                if (query != null) URLDecoder.decode(query, StandardCharsets.UTF_8) else ""
-            }
-
-        // Handle the request
-        val rawResponse =
-            runBlocking {
-                skirService.handleRequest(
-                    requestBody,
-                    RequestMetadata.fromHeaders(exchange.requestHeaders),
-                )
-            }
-
-        // Send response
-        exchange.responseHeaders["Content-Type"] = rawResponse.contentType
-
-        val responseBytes = rawResponse.data.toByteArray(StandardCharsets.UTF_8)
-        exchange.sendResponseHeaders(rawResponse.statusCode, responseBytes.size.toLong())
-        exchange.responseBody.use { os ->
-            os.write(responseBytes)
-        }
-    }
-
-    server.executor = null // creates a default executor
-    server.start()
     println("Serving at http://localhost:8787")
     println("API endpoint: http://localhost:8787/myapi")
     println("Press Ctrl+C to stop the server")
+
+    embeddedServer(Netty, port = 8787) {
+        routing {
+            get("/") {
+                call.respondText("Hello, World!")
+            }
+
+            // Shared logic for /myapi
+            val apiHandler: suspend (io.ktor.server.application.ApplicationCall) -> Unit =
+                { call ->
+                    // -----------------------------------------------------------------------------
+                    // Install the Skir service on the Ktor server.
+
+                    val requestBody =
+                        if (call.request.local.method == HttpMethod.Post) {
+                            call.receiveText()
+                        } else {
+                            // For GET requests, use the query string
+                            val query = call.request.queryString()
+                            URLDecoder.decode(query, StandardCharsets.UTF_8)
+                        }
+
+                    // Handle the request
+                    val rawResponse =
+                        skirService.handleRequest(
+                            requestBody,
+                            RequestMetadata.fromHeaders(call.request.headers),
+                        )
+
+                    call.response.header("Content-Type", rawResponse.contentType)
+                    call.respondBytes(
+                        bytes = rawResponse.data.toByteArray(StandardCharsets.UTF_8),
+                        status = HttpStatusCode.fromValue(rawResponse.statusCode),
+                    )
+                    // -----------------------------------------------------------------------------
+                }
+
+            post("/myapi") { apiHandler(call) }
+            get("/myapi") { apiHandler(call) }
+        }
+    }.start(wait = true)
 }
