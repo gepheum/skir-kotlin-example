@@ -6,4 +6,3 @@ set -e
 npx skir gen
 ./gradlew build
 ./gradlew run
-

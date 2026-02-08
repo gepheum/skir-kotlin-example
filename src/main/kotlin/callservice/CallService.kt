@@ -9,7 +9,6 @@ import skirout.service.GetUserRequest
 import skirout.user.SubscriptionStatus
 import skirout.user.TARZAN
 import skirout.user.User
-import java.net.http.HttpClient
 import java.time.Duration
 
 /**
@@ -21,12 +20,7 @@ import java.time.Duration
  */
 fun main() =
     runBlocking {
-        val serviceClient =
-            ServiceClient(
-                "http://localhost:8787/myapi",
-                emptyMap(),
-                HttpClient.newHttpClient(),
-            )
+        val serviceClient = ServiceClient("http://localhost:8787/myapi")
 
         println()
         println("About to add 2 users: John Doe and Tarzan")
