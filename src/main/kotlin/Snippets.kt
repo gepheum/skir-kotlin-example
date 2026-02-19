@@ -1,6 +1,7 @@
 package examples
 
 import build.skir.JsonFlavor
+import build.skir.Serializers
 import build.skir.reflection.StructDescriptor
 import build.skir.reflection.TypeDescriptor
 import skirout.user.SubscriptionStatus
@@ -13,6 +14,7 @@ import skirout.user.UserRegistry
 import skirout.user.User_OrMutable
 import java.time.Instant
 
+@Suppress("ktlint:standard:discouraged-comment-location")
 fun main() {
     // ===========================================================================
     // FROZEN STRUCT CLASSES
@@ -268,6 +270,51 @@ fun main() {
     assert(reserializedEvilJohn.equals(evilJohn))
 
     assert(serializer.fromBytes(johnBytes).equals(john))
+
+    // =========================================================================
+    // PRIMITIVE SERIALIZERS
+    // =========================================================================
+
+    assert(Serializers.bool.toJsonCode(true) == "1")
+    assert(Serializers.int32.toJsonCode(3) == "3")
+    assert( //
+        Serializers.int64.toJsonCode(9223372036854775807L)
+            == "\"9223372036854775807\"",
+    )
+    assert(
+        Serializers.javaHash64.toJsonCode(9223372036854775807L) ==
+            "\"9223372036854775807\"",
+    )
+    assert( //
+        Serializers.timestamp.toJsonCode(
+            java.time.Instant.ofEpochMilli(1743682787000L),
+        )
+            == "1743682787000",
+    )
+    assert(Serializers.float32.toJsonCode(3.14f) == "3.14")
+    assert(Serializers.float64.toJsonCode(3.14) == "3.14")
+    assert(Serializers.string.toJsonCode("Foo") == "\"Foo\"")
+    assert( //
+        Serializers.bytes.toJsonCode(okio.ByteString.of(1, 2, 3)) == "\"AQID\"",
+    )
+
+    // =========================================================================
+    // COMPOSITE SERIALIZERS
+    // =========================================================================
+
+    assert(
+        Serializers.optional(Serializers.string) //
+            .toJsonCode("foo") == "\"foo\"",
+    )
+    assert(
+        Serializers.optional(Serializers.string) //
+            .toJsonCode(null) == "null",
+    )
+
+    assert(
+        Serializers.list(Serializers.bool) //
+            .toJsonCode(listOf(true, false)) == "[1,0]",
+    )
 
     // =========================================================================
     // CONSTANTS
