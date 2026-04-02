@@ -17,7 +17,7 @@ npx skir gen
 ./gradlew run
 ```
 
-### Start a skir service
+### Start a SkirRPC service
 
 From one process, run:
 ```shell
