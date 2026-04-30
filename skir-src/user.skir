@@ -15,12 +15,12 @@ struct User {
 }
 
 enum SubscriptionStatus {
-  FREE;
+  free;
   struct Trial {
     start_time: timestamp;
   }
   trial: Trial;
-  PREMIUM;
+  premium;
 }
 
 /// King of the jungle
